@@ -1,0 +1,15 @@
+{
+  "name": "vue-webpack",
+  "version": "1.0.0",
+  "description": "```\r npm init -y\r npm install webpack webpack-cli -D\r ```",
+  "main": "3.commenjs原理.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2"
+  }
+}

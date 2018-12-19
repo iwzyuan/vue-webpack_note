@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script src="https://lib.baomitu.com/vue/2.5.18/vue.js"></script>
+<script>
+    const globalObj = {
+            txt1: '1',
+            txt2: '2'
+        }
+
+    function defineReactive(obj,key,val,render){
+        /* 一个Dep类对象 */
+        const dep = new Dep();
+
+        Object.defineProperty(obj,key,{
+            enumerabel: true,
+            configurable: true,
+            get: ()=> {
+                /* 将Dep.target（即当前的Watcher对象存入dep的subs中） */
+                dep.addSub(Dep.target);
+                return val
+            },
+            set: newVal => {
+                val = newVal;
+                // render();
+                /* 在set的时候触发dep的notify来通知所有的Watcher对象更新视图 */
+                console.log(dep.subs)
+                dep.notify();
+            }
+        })
+    }
+    function observe(value, render) {
+        console.log(Object.keys(value))
+        Object.keys(value).forEach(key => {
+            defineReactive(value,key,value[key],render)
+        })
+    }
+    function _proxy(data){
+        let that = this;
+        Object.keys(data).forEach(key => {
+            Object.defineProperty(that, key, {
+                enumerabel: true,
+                configurable: true,
+                get: function proxyGetter() {
+                    return that._data[key];
+                },
+                set: function proxySetter(newVal) {
+                    that._data[key] = newVal;
+                }
+            })
+        })
+    }
+
+    class Dep {
+        constructor () {
+            this.subs = [];
+        }
+        addSub (sub) {
+            this.subs.push(sub)
+        }
+        notify () {
+            this.subs.forEach(item => {
+                console.log(item)
+                item.update();
+            })
+        }
+    }
+
+    class Watcher {
+        constructor (a) {
+             /* 在new一个Watcher对象时将该对象赋值给Dep.target，在get中会用到 */
+             console.log(a)
+             this.a = a;
+             Dep.target = this;
+        }
+        update () {
+            console.log('试图更新啦')
+        }
+    }
+
+    Dep.target = null;
+
+    class VueCostom {
+        constructor(options){
+            this._data = options.data;
+            observe(this._data, options.render);
+            _proxy.call(this, options.data);
+            new Watcher(options.watch);
+        }
+    }
+
+    const vmVueCostom = new VueCostom({
+        data: globalObj,
+        render () {
+            console.log('视图更新1');
+        },
+        watch: 1
+    })
+
+
+    // const vm = new Vue({
+    //     data: {
+    //         txt1: '1',
+    //         txt2: '2'
+    //     },
+    //     render () {
+    //         console.log('视图更新');
+    //     }
+    // })
+    // vm.txt1 = '改变了'
+    // console.log(vm)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+</script>
+</html>
